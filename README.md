@@ -55,7 +55,7 @@ Pin `@v1`, not `@main`. Add extra jobs in the caller repo when the class workflo
 
 - `working-directory` (default `.`) when package.json is not at the repo root (DOAR).
 - `node-version` (default `22`) when the lockfile is not Bun.
-- `bun-version` (default `1.2.20`) pinned for reproducibility. Callers can override.
+- `bun-version` (default `1.4.0`) pinned for reproducibility. Callers can override.
 - `package-manager` optional. Required when more than one supported lockfile is present.
 
 Detection scans working-directory for the supported lockfiles and emits the exact file path.
