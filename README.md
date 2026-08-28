@@ -51,7 +51,26 @@ jobs:
 
 Pin `@v1`, not `@main`. Add extra jobs in the caller repo when the class workflow is not enough (for example meal-planning QC).
 
-`node-bun.yml` accepts `working-directory` when `package.json` is not at the repo root (DOAR).
+`node-bun.yml` inputs:
+
+- `working-directory` (default `.`) when package.json is not at the repo root (DOAR).
+- `node-version` (default `22`) when the lockfile is not Bun.
+- `bun-version` (default `1.2.20`) pinned for reproducibility. Callers can override.
+- `package-manager` optional. Required when more than one supported lockfile is present.
+
+Detection scans working-directory for the supported lockfiles and emits the exact file path.
+That file path is passed to setup-node cache-dependency-path. Do not pass a directory.
+If more than one supported lockfile exists and package-manager is unset, the job fails.
+
+Installs stay frozen or immutable.
+
+- bun: `bun install --frozen-lockfile`
+- pnpm: `pnpm install --frozen-lockfile`
+- npm: `npm ci`
+- yarn: Corepack is enabled. Yarn 1 uses `--frozen-lockfile`. Yarn 2+ uses `--immutable`.
+
+Lockfile detect fixtures live in `fixtures/node-lockfile/` and are proven by `scripts/test-detect-node-lockfile.sh`.
+The reusable workflow inlines the same rules because checkout is the caller repo.
 
 ## Templates
 

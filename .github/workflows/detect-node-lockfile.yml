@@ -1,0 +1,27 @@
+name: Node lockfile detect
+
+on:
+  push:
+    paths:
+      - "scripts/detect-node-lockfile.sh"
+      - "scripts/test-detect-node-lockfile.sh"
+      - "fixtures/node-lockfile/**"
+      - ".github/workflows/detect-node-lockfile.yml"
+      - ".github/workflows/node-bun.yml"
+  pull_request:
+    paths:
+      - "scripts/detect-node-lockfile.sh"
+      - "scripts/test-detect-node-lockfile.sh"
+      - "fixtures/node-lockfile/**"
+      - ".github/workflows/detect-node-lockfile.yml"
+      - ".github/workflows/node-bun.yml"
+
+jobs:
+  detect-fixtures:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run detect fixtures
+        run: bash scripts/test-detect-node-lockfile.sh
