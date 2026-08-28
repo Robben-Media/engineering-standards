@@ -53,6 +53,10 @@ Pin `@v1`, not `@main`. Add extra jobs in the caller repo when the class workflo
 
 `node-bun.yml` accepts `working-directory` when `package.json` is not at the repo root (DOAR).
 
+## Agent pointer
+
+Each repo gets a short [`templates/STANDARDS.md`](templates/STANDARDS.md). Replace `CLASS` with `go-cli`, `node-bun`, `python-tool`, or `docs-only`. Do not overwrite `AGENTS.md`.
+
 ## Templates
 
 Gitignore starters live in [`templates/gitignore/`](templates/gitignore/). Copy the one that matches the class. Do not paste workflows.
