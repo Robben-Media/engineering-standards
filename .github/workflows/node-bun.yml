@@ -1,0 +1,106 @@
+name: Live Node
+
+on:
+  workflow_call:
+    inputs:
+      working-directory:
+        description: Directory that contains package.json and the lockfile
+        type: string
+        required: false
+        default: "."
+      node-version:
+        description: Node.js version when the lockfile is not Bun
+        type: string
+        required: false
+        default: "22"
+      bun-version:
+        description: Bun version
+        type: string
+        required: false
+        default: "latest"
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Detect package manager
+        id: pm
+        working-directory: ${{ inputs.working-directory }}
+        run: |
+          set -euo pipefail
+          if [ -f bun.lock ] || [ -f bun.lockb ]; then
+            echo "name=bun" >> "$GITHUB_OUTPUT"
+          elif [ -f pnpm-lock.yaml ]; then
+            echo "name=pnpm" >> "$GITHUB_OUTPUT"
+          elif [ -f yarn.lock ]; then
+            echo "name=yarn" >> "$GITHUB_OUTPUT"
+          elif [ -f package-lock.json ]; then
+            echo "name=npm" >> "$GITHUB_OUTPUT"
+          else
+            echo "No supported lockfile in ${{ inputs.working-directory }}" >&2
+            exit 1
+          fi
+
+      - uses: oven-sh/setup-bun@v2
+        if: steps.pm.outputs.name == 'bun'
+        with:
+          bun-version: ${{ inputs.bun-version }}
+
+      - uses: pnpm/action-setup@v4
+        if: steps.pm.outputs.name == 'pnpm'
+        with:
+          run_install: false
+
+      - uses: actions/setup-node@v4
+        if: steps.pm.outputs.name != 'bun'
+        with:
+          node-version: ${{ inputs.node-version }}
+          cache: ${{ steps.pm.outputs.name }}
+          cache-dependency-path: ${{ inputs.working-directory }}
+
+      - name: Install
+        working-directory: ${{ inputs.working-directory }}
+        run: |
+          set -euo pipefail
+          case "${{ steps.pm.outputs.name }}" in
+            bun) bun install --frozen-lockfile ;;
+            pnpm) pnpm install --frozen-lockfile ;;
+            yarn) yarn install --frozen-lockfile ;;
+            npm) npm ci ;;
+          esac
+
+      - name: Lint
+        working-directory: ${{ inputs.working-directory }}
+        run: |
+          set -euo pipefail
+          if node -e "process.exit((require('./package.json').scripts||{}).lint?0:1)"; then
+            case "${{ steps.pm.outputs.name }}" in
+              bun) bun run lint ;;
+              pnpm) pnpm run lint ;;
+              yarn) yarn lint ;;
+              npm) npm run lint ;;
+            esac
+          else
+            echo "No lint script; skipping"
+          fi
+
+      - name: Test
+        working-directory: ${{ inputs.working-directory }}
+        run: |
+          set -euo pipefail
+          if node -e "process.exit((require('./package.json').scripts||{}).test?0:1)"; then
+            case "${{ steps.pm.outputs.name }}" in
+              bun) bun run test ;;
+              pnpm) pnpm test ;;
+              yarn) yarn test ;;
+              npm) npm test ;;
+            esac
+          elif [ "${{ steps.pm.outputs.name }}" = "bun" ]; then
+            bun test
+          else
+            echo "No test script; skipping"
+          fi

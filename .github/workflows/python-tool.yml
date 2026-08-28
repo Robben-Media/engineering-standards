@@ -1,0 +1,54 @@
+name: Python tool
+
+on:
+  workflow_call:
+    inputs:
+      python-version:
+        description: CPython version
+        type: string
+        required: false
+        default: "3.12"
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Require a Python manifest
+        run: |
+          set -euo pipefail
+          if [ ! -f pyproject.toml ] && [ ! -f requirements.txt ] && [ ! -f requirements-test.txt ]; then
+            echo "Expected pyproject.toml or requirements.txt" >&2
+            exit 1
+          fi
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ inputs.python-version }}
+          cache: pip
+
+      - name: Install
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          if [ -f requirements-test.txt ]; then
+            python -m pip install -r requirements-test.txt
+          elif [ -f requirements.txt ]; then
+            python -m pip install -r requirements.txt
+          fi
+          if [ -f pyproject.toml ]; then
+            python -m pip install -e .
+          fi
+          python -m pip install pytest
+
+      - name: Test
+        run: |
+          set -euo pipefail
+          if [ -d tests ] || [ -d test ] || ls test_*.py *_test.py >/dev/null 2>&1; then
+            python -m pytest
+          else
+            python -m compileall -q .
+          fi
