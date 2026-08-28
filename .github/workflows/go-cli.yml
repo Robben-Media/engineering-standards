@@ -1,0 +1,56 @@
+name: Go CLI
+
+on:
+  workflow_call:
+    inputs:
+      go-version:
+        description: Go toolchain version
+        type: string
+        required: false
+        default: "1.25.1"
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Require go.mod
+        run: |
+          set -euo pipefail
+          test -f go.mod
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: ${{ inputs.go-version }}
+          cache: true
+
+      - name: Download modules
+        run: go mod download
+
+      - name: Format
+        run: |
+          set -euo pipefail
+          if [ -f Makefile ] && grep -qE '^fmt-check:' Makefile; then
+            make fmt-check
+          else
+            unformatted="$(gofmt -l .)"
+            if [ -n "$unformatted" ]; then
+              echo "$unformatted"
+              exit 1
+            fi
+          fi
+
+      - name: Vet
+        run: go vet ./...
+
+      - name: Test
+        run: |
+          set -euo pipefail
+          if [ -f Makefile ] && grep -qE '^test:' Makefile; then
+            make test
+          else
+            go test ./...
+          fi

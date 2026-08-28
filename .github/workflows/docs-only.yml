@@ -1,0 +1,26 @@
+name: Docs only
+
+on:
+  workflow_call:
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Confirm docs-only
+        run: |
+          set -euo pipefail
+          unexpected=""
+          for f in go.mod package.json bun.lock bun.lockb pnpm-lock.yaml package-lock.json yarn.lock pyproject.toml requirements.txt requirements-test.txt Cargo.toml; do
+            if [ -f "$f" ]; then
+              unexpected="$unexpected $f"
+            fi
+          done
+          if [ -n "$unexpected" ]; then
+            echo "Repo has app manifests; it is no longer docs-only:$unexpected" >&2
+            exit 1
+          fi
