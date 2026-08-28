@@ -33,6 +33,21 @@ Hold a live-Node caller when the repo is a lockfile scaffold with no source (`fi
 
 Out of catalog: Homebrew taps, agent workspace/soul trees, archives, forks, empty twins.
 
+## CI contract
+
+Each CI-enabled class has one explicit contract. The reusable workflow supplies the environment, dependency install, and safe defaults. The repository owns the check list.
+
+| Class | Contract | Fallback when the contract is absent |
+| --- | --- | --- |
+| Go CLI | `make ci` | Existing Makefile targets among `fmt-check`/`fmt`, `lint`, `vet`, `test`, `build`; otherwise `gofmt` / `go vet` / `go test` as today |
+| Live Node | package-manager `ci` script | `lint`, `typecheck`, `test`, and `build` scripts when present; `bun test` if Bun and there is no `test` script |
+| Python tool | `make ci` | Makefile `lint`/`test` if present; else ruff/black/mypy/pytest when configured or declared; else pytest or compileall |
+| Docs-only | Unchanged (class-drift only) | — |
+
+A repository with source, no contract, and a fallback that would run zero checks fails and points at [docs/classes.md](docs/classes.md). A lockfile or manifest scaffold with no application source stays caller-less (skip, do not fail).
+
+Add the class contract when convenient; issue #5 will add migration gates, and copied CI should not be removed until the replacement has a successful authoritative run.
+
 ## Caller shape
 
 ```yaml
