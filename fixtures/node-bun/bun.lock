@@ -1,9 +1,15 @@
 {
-  "lockfileVersion": 1,
+  "lockfileVersion": 2,
+  "configVersion": 1,
   "workspaces": {
     "": {
       "name": "fixture-node-bun",
+      "dependencies": {
+        "local-hello": "file:./vendor",
+      },
     },
   },
-  "packages": {},
+  "packages": {
+    "local-hello": ["local-hello@file:vendor", {}],
+  }
 }
