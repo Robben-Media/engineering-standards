@@ -51,7 +51,13 @@ jobs:
 
 Pin `@v1`, not `@main`. Add extra jobs in the caller repo when the class workflow is not enough (for example meal-planning QC).
 
-`node-bun.yml` accepts `working-directory` when `package.json` is not at the repo root (DOAR).
+All four workflows accept `working-directory` (default `.`) when the manifest is not at the repo root (`node-bun.yml` already did; the others gained it so this repo can host fixtures). DOAR is the Node subdirectory example.
+
+## Release
+
+See [docs/release.md](docs/release.md). Callers stay on `@v1`. Jeremy moves that tag after Nash/Jeremy review. Third-party actions in this repo are pinned to full commit SHAs.
+
+In-repo Fixture CI (`.github/workflows/fixture-ci.yml`) exercises every reusable workflow against [fixtures/](fixtures/) before `v1` moves. The initial `v1` record is [docs/releases/v1.md](docs/releases/v1.md).
 
 ## Templates
 
