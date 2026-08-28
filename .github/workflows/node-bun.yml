@@ -54,6 +54,7 @@ jobs:
         if: steps.pm.outputs.name == 'pnpm'
         with:
           run_install: false
+          package_json_file: ${{ inputs.working-directory }}/package.json
 
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         if: steps.pm.outputs.name != 'bun'
