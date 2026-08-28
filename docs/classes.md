@@ -43,7 +43,7 @@ Caller: `node-bun.yml@v1`. The workflow picks the package manager from the lockf
 
 **Contract:** a `ci` script in `package.json`, invoked with the lockfile's package manager.
 
-**Fallback** (no `ci` script): run `lint`, `typecheck`, `test`, and `build` when those scripts exist. If the lockfile is Bun and there is no `test` script, run `bun test`. Frozen/immutable installs stay as on current main.
+**Fallback** (no `ci` script): run `lint`, `typecheck`, `test`, and `build` when those scripts exist. If the lockfile is Bun and there is no `test` script, run `bun test` unless `test:*` scripts exist (those stay caller-owned; the reusable fallback does not run them). Frozen/immutable installs stay as on current main.
 
 **Caller-less / fail-clearly:** a lockfile scaffold with no application source stays caller-less — hold the caller; if the workflow is invoked it skips checks rather than failing. `itsjeremyjohnson/finance` (lockfile + `package.json` + `tsconfig.json`, no source) is the example. A repository with source, no `ci` script, and no fallback checks fails and points here.
 
