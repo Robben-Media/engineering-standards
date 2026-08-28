@@ -72,7 +72,7 @@ Installs stay frozen or immutable.
 Lockfile detect fixtures live in `fixtures/node-lockfile/` and are proven by `scripts/test-detect-node-lockfile.sh`.
 The reusable workflow inlines the same rules because checkout is the caller repo.
 
-All four workflows accept `working-directory` (default `.`) when the manifest is not at the repo root. DOAR is the Node subdirectory example.
+All four workflows accept `working-directory` (default `.`) when the manifest is not at the repo root (`node-bun.yml` already did; the others gained it so this repo can host fixtures). DOAR is the Node subdirectory example.
 
 ## Release
 
