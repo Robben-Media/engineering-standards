@@ -15,12 +15,37 @@ jobs:
         run: |
           set -euo pipefail
           unexpected=""
-          for f in go.mod package.json bun.lock bun.lockb pnpm-lock.yaml package-lock.json yarn.lock pyproject.toml requirements.txt requirements-test.txt Cargo.toml; do
+          for f in go.mod package.json bun.lock bun.lockb pnpm-lock.yaml package-lock.json yarn.lock pyproject.toml requirements.txt requirements-test.txt Cargo.toml Pipfile uv.lock composer.json Gemfile deno.json deno.jsonc; do
             if [ -f "$f" ]; then
               unexpected="$unexpected $f"
             fi
           done
           if [ -n "$unexpected" ]; then
-            echo "Repo has app manifests; it is no longer docs-only:$unexpected" >&2
+            echo "Repo is no longer docs-only. Class-drift markers:$unexpected" >&2
+            for f in $unexpected; do
+              class="out of catalog"
+              [ "${f%.lock}" != "$f" ] && class="Live Node (supported)"
+              [ "${f%.lockb}" != "$f" ] && class="Live Node (supported)"
+              [ "${f%lock.yaml}" != "$f" ] && class="Live Node (supported)"
+              [ "${f%lock.json}" != "$f" ] && class="Live Node (supported)"
+              [ "$f" = "go.mod" ] && class="Go CLI (supported)"
+              [ "$f" = "package.json" ] && class="Live Node (supported)"
+              [ "$f" = "bun.lock" ] && class="Live Node (supported)"
+              [ "$f" = "bun.lockb" ] && class="Live Node (supported)"
+              [ "$f" = "pyproject.toml" ] && class="Python tool (supported)"
+              [ "$f" = "requirements.txt" ] && class="Python tool (supported)"
+              [ "$f" = "requirements-test.txt" ] && class="Python tool (supported)"
+              [ "$f" = "Pipfile" ] && class="Python tool (supported; Pipenv)"
+              [ "$f" = "uv.lock" ] && class="Python tool (supported; uv)"
+              [ "$f" = "Cargo.toml" ] && class="out of catalog (Rust)"
+              [ "$f" = "composer.json" ] && class="out of catalog (Composer/PHP)"
+              [ "$f" = "Gemfile" ] && class="out of catalog (Ruby)"
+              [ "$f" = "deno.json" ] && class="out of catalog (Deno)"
+              [ "$f" = "deno.jsonc" ] && class="out of catalog (Deno)"
+              echo "  - $f  ->  $class" >&2
+            done
+            echo "Supported caller classes: go-cli, node-bun, python-tool." >&2
+            echo "Out-of-catalog markers mean this repo is not docs-only and has no catalog class." >&2
+            echo "See docs/classes.md and docs/migration.md." >&2
             exit 1
           fi
