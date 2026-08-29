@@ -55,7 +55,7 @@ Pin `@v1`, not `@main`. Add extra jobs in the caller repo when the class workflo
 
 - `working-directory` (default `.`) when package.json is not at the repo root (DOAR).
 - `node-version` (default `22`) when the lockfile is not Bun.
-- `bun-version` (default `1.2.20`) pinned for reproducibility. Callers can override.
+- `bun-version` (default `1.4.0`) pinned for reproducibility. Callers can override.
 - `package-manager` optional. Required when more than one supported lockfile is present.
 
 Detection scans working-directory for the supported lockfiles and emits the exact file path.
@@ -71,6 +71,14 @@ Installs stay frozen or immutable.
 
 Lockfile detect fixtures live in `fixtures/node-lockfile/` and are proven by `scripts/test-detect-node-lockfile.sh`.
 The reusable workflow inlines the same rules because checkout is the caller repo.
+
+All four workflows accept `working-directory` (default `.`) when the manifest is not at the repo root (`node-bun.yml` already did; the others gained it so this repo can host fixtures). DOAR is the Node subdirectory example.
+
+## Release
+
+See [docs/release.md](docs/release.md). Callers stay on `@v1`. Jeremy moves that tag after Nash/Jeremy review. Third-party actions in this repo are pinned to full commit SHAs.
+
+In-repo Fixture CI (`.github/workflows/fixture-ci.yml`) exercises every reusable workflow against [fixtures/](fixtures/) before `v1` moves. The initial `v1` record is [docs/releases/v1.md](docs/releases/v1.md).
 
 ## Agent pointer
 

@@ -1,0 +1,1 @@
+# Fixture installs pytest in the reusable workflow; no extra deps.
