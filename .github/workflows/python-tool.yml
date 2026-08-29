@@ -55,12 +55,132 @@ jobs:
           fi
           python -m pip install pytest
 
-      - name: Test
+      - name: Run CI contract
         working-directory: ${{ inputs.working-directory }}
         run: |
           set -euo pipefail
-          if [ -d tests ] || [ -d test ] || ls ./test_*.py ./*_test.py >/dev/null 2>&1; then
-            python -m pytest
+          # Contract: make ci. Fallback and fail-clearly: docs/classes.md
+          has_make_target() {
+            [ -f Makefile ] && grep -qE "^${1}:" Makefile
+          }
+
+          has_py_source() {
+            find . \
+              \( -path './.git' -o -path './.venv' -o -path './venv' -o -path './.tox' \
+                 -o -path './__pycache__' -o -path './.mypy_cache' -o -path './.ruff_cache' \
+                 -o -path './node_modules' \) -prune -o \
+              -type f -name '*.py' -print -quit | grep -q .
+          }
+
+          py_declares() {
+            local pkg="$1"
+            if [ -f pyproject.toml ] && grep -Eiq "(^|[[:space:]\"'[])${pkg}([\"'[:space:]=><!~,]|$)" pyproject.toml; then
+              return 0
+            fi
+            local f
+            for f in requirements.txt requirements-test.txt; do
+              if [ -f "$f" ] && grep -Eiq "^[[:space:]]*${pkg}([[:space:]]|[><=~!<[]|$)" "$f"; then
+                return 0
+              fi
+            done
+            return 1
+          }
+
+          has_ruff() {
+            [ -f ruff.toml ] || [ -f .ruff.toml ] \
+              || { [ -f pyproject.toml ] && grep -qE '\[tool\.ruff' pyproject.toml; } \
+              || py_declares ruff
+          }
+
+          has_black() {
+            { [ -f pyproject.toml ] && grep -qE '\[tool\.black' pyproject.toml; } \
+              || py_declares black
+          }
+
+          has_mypy() {
+            [ -f mypy.ini ] || [ -f .mypy.ini ] \
+              || { [ -f pyproject.toml ] && grep -qE '\[tool\.mypy' pyproject.toml; } \
+              || { [ -f setup.cfg ] && grep -qE '^\[mypy' setup.cfg; } \
+              || py_declares mypy
+          }
+
+          has_pytest_config_or_dep() {
+            [ -f pytest.ini ] || [ -f .pytest.ini ] || [ -f conftest.py ] \
+              || { [ -f pyproject.toml ] && grep -qE '\[tool\.pytest' pyproject.toml; } \
+              || py_declares pytest
+          }
+
+          has_pytest_tree() {
+            [ -d tests ] || [ -d test ] || ls ./test_*.py ./*_test.py >/dev/null 2>&1
+          }
+
+          ensure_mod() {
+            local mod="$1"
+            python -c "import ${mod}" >/dev/null 2>&1 || python -m pip install "$mod"
+          }
+
+          fail_missing_contract() {
+            echo "This repository has Python source but no CI contract and no fallback checks." >&2
+            echo "Add a make ci target, or see docs/classes.md in Robben-Media/engineering-standards." >&2
+            exit 1
+          }
+
+          if has_make_target ci; then
+            echo "CI contract: make ci"
+            make ci
+            exit 0
+          fi
+
+          if ! has_py_source; then
+            echo "No Python source and no make ci contract; treating as caller-less manifest scaffold. Skipping checks."
+            echo "See docs/classes.md in Robben-Media/engineering-standards."
+            exit 0
+          fi
+
+          ran=0
+
+          if has_make_target lint || has_make_target test; then
+            if has_make_target lint; then
+              echo "Fallback: make lint"
+              make lint
+              ran=$((ran + 1))
+            fi
+            if has_make_target test; then
+              echo "Fallback: make test"
+              make test
+              ran=$((ran + 1))
+            fi
+          elif has_ruff || has_black || has_mypy || has_pytest_config_or_dep || has_pytest_tree; then
+            if has_ruff; then
+              echo "Fallback: ruff"
+              ensure_mod ruff
+              python -m ruff check .
+              python -m ruff format --check .
+              ran=$((ran + 1))
+            fi
+            if has_black; then
+              echo "Fallback: black"
+              ensure_mod black
+              python -m black --check .
+              ran=$((ran + 1))
+            fi
+            if has_mypy; then
+              echo "Fallback: mypy"
+              ensure_mod mypy
+              python -m mypy .
+              ran=$((ran + 1))
+            fi
+            if has_pytest_config_or_dep || has_pytest_tree; then
+              echo "Fallback: pytest"
+              python -m pytest
+              ran=$((ran + 1))
+            fi
           else
+            echo "Fallback: compileall"
             python -m compileall -q .
+            ran=$((ran + 1))
+          fi
+
+          if [ "$ran" -eq 0 ]; then
+            fail_missing_contract
           fi

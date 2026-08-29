@@ -143,34 +143,107 @@ jobs:
           npm) npm ci ;;
           esac
 
-      - name: Lint
+      - name: Run CI contract
         working-directory: ${{ inputs.working-directory }}
         run: |
           set -euo pipefail
-          if node -e "process.exit((require('./package.json').scripts||{}).lint?0:1)"; then
-            case "${{ steps.pm.outputs.name }}" in
-              bun) bun run lint ;;
-              pnpm) pnpm run lint ;;
-              yarn) yarn lint ;;
-              npm) npm run lint ;;
+          # Contract: package.json ci script. Fallback and fail-clearly: docs/classes.md
+          PM="${{ steps.pm.outputs.name }}"
+
+          has_script() {
+            node -e "process.exit((require('./package.json').scripts||{})[process.argv[1]]?0:1)" "$1"
+          }
+
+          has_test_star() {
+            node -e "const s=require('./package.json').scripts||{}; process.exit(Object.keys(s).some(k=>k.startsWith('test:'))?0:1)"
+          }
+
+          run_script() {
+            local name="$1"
+            case "$PM" in
+              bun) bun run "$name" ;;
+              pnpm) pnpm run "$name" ;;
+              yarn) yarn "$name" ;;
+              npm)
+                if [ "$name" = "test" ]; then
+                  npm test
+                else
+                  npm run "$name"
+                fi
+                ;;
+              *)
+                echo "Unknown package manager: $PM" >&2
+                exit 1
+                ;;
             esac
-          else
-            echo "No lint script; skipping"
+          }
+
+          has_node_source() {
+            find . \
+              \( -path './node_modules' -o -path './.git' -o -path './dist' -o -path './build' \
+                 -o -path './coverage' -o -path './.next' -o -path './.astro' -o -path './.output' \
+                 -o -path './out' -o -path './vendor' \) -prune -o \
+              -type f \( \
+                -name '*.ts' -o -name '*.tsx' -o -name '*.js' -o -name '*.jsx' \
+                -o -name '*.mjs' -o -name '*.cjs' -o -name '*.mts' -o -name '*.cts' \
+                -o -name '*.astro' -o -name '*.vue' -o -name '*.svelte' \
+              \) \
+              ! -name '*.config.js' ! -name '*.config.ts' ! -name '*.config.mjs' \
+              ! -name '*.config.cjs' ! -name '*.config.mts' ! -name '*.config.cts' \
+              ! -name 'eslint.config.js' ! -name 'eslint.config.ts' ! -name 'eslint.config.mjs' \
+              ! -name 'eslint.config.cjs' \
+              -print -quit | grep -q .
+          }
+
+          fail_missing_contract() {
+            echo "This repository has application source but no CI contract and no fallback checks." >&2
+            echo "Add a ci script to package.json (lint/typecheck/test/build scripts are the fallback)." >&2
+            echo "See docs/classes.md in Robben-Media/engineering-standards." >&2
+            exit 1
+          }
+
+          if has_script ci; then
+            echo "CI contract: $PM run ci"
+            run_script ci
+            exit 0
           fi
 
-      - name: Test
-        working-directory: ${{ inputs.working-directory }}
-        run: |
-          set -euo pipefail
-          if node -e "process.exit((require('./package.json').scripts||{}).test?0:1)"; then
-            case "${{ steps.pm.outputs.name }}" in
-              bun) bun run test ;;
-              pnpm) pnpm test ;;
-              yarn) yarn test ;;
-              npm) npm test ;;
-            esac
-          elif [ "${{ steps.pm.outputs.name }}" = "bun" ]; then
+          if ! has_node_source; then
+            echo "No application source and no ci script; treating as caller-less lockfile scaffold. Skipping checks."
+            echo "See docs/classes.md in Robben-Media/engineering-standards."
+            exit 0
+          fi
+
+          ran=0
+
+          if has_script lint; then
+            echo "Fallback: lint"
+            run_script lint
+            ran=$((ran + 1))
+          fi
+
+          if has_script typecheck; then
+            echo "Fallback: typecheck"
+            run_script typecheck
+            ran=$((ran + 1))
+          fi
+
+          if has_script test; then
+            echo "Fallback: test"
+            run_script test
+            ran=$((ran + 1))
+          elif [ "$PM" = "bun" ] && ! has_test_star; then
+            echo "Fallback: bun test"
             bun test
-          else
-            echo "No test script; skipping"
+            ran=$((ran + 1))
+          fi
+
+          if has_script build; then
+            echo "Fallback: build"
+            run_script build
+            ran=$((ran + 1))
+          fi
+
+          if [ "$ran" -eq 0 ]; then
+            fail_missing_contract
           fi
