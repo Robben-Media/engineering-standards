@@ -8,6 +8,11 @@ on:
         type: string
         required: false
         default: "1.25.1"
+      working-directory:
+        description: Directory that contains go.mod
+        type: string
+        required: false
+        default: "."
 
 jobs:
   ci:
@@ -15,22 +20,26 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
       - name: Require go.mod
+        working-directory: ${{ inputs.working-directory }}
         run: |
           set -euo pipefail
           test -f go.mod
 
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5.6.0
         with:
           go-version: ${{ inputs.go-version }}
           cache: true
+          cache-dependency-path: ${{ inputs.working-directory }}/go.sum
 
       - name: Download modules
+        working-directory: ${{ inputs.working-directory }}
         run: go mod download
 
       - name: Run CI contract
+        working-directory: ${{ inputs.working-directory }}
         run: |
           set -euo pipefail
           # Contract: make ci. Fallback and fail-clearly: docs/classes.md

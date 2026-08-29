@@ -1,0 +1,12 @@
+{
+  "name": "fixture-node-bun",
+  "private": true,
+  "description": "Minimal Fixture CI app",
+  "scripts": {
+    "lint": "node index.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "local-hello": "file:./vendor"
+  }
+}

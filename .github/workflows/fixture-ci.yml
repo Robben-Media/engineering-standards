@@ -1,0 +1,82 @@
+name: Fixture CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lint-workflows:
+    name: lint-workflows
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: "3.12"
+
+      - name: Parse workflow YAML
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install pyyaml
+          python3 scripts/lint-workflows.py
+
+      - name: actionlint
+        env:
+          ACTIONLINT_VERSION: "1.7.12"
+          ACTIONLINT_SHA256: "8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8"
+        run: bash scripts/run-actionlint.sh
+
+  go-cli:
+    name: go-cli
+    uses: ./.github/workflows/go-cli.yml
+    with:
+      working-directory: fixtures/go
+
+  python-tool:
+    name: python-tool
+    uses: ./.github/workflows/python-tool.yml
+    with:
+      working-directory: fixtures/python
+
+  docs-only:
+    name: docs-only
+    uses: ./.github/workflows/docs-only.yml
+    with:
+      working-directory: fixtures/docs-only
+
+  node-npm:
+    name: node-npm
+    uses: ./.github/workflows/node-bun.yml
+    with:
+      working-directory: fixtures/node-npm
+
+  node-pnpm:
+    name: node-pnpm
+    uses: ./.github/workflows/node-bun.yml
+    with:
+      working-directory: fixtures/node-pnpm
+
+  node-yarn:
+    name: node-yarn
+    uses: ./.github/workflows/node-bun.yml
+    with:
+      working-directory: fixtures/node-yarn
+
+  node-bun:
+    name: node-bun
+    uses: ./.github/workflows/node-bun.yml
+    with:
+      working-directory: fixtures/node-bun
+
+  node-subdir:
+    name: node-subdir
+    uses: ./.github/workflows/node-bun.yml
+    with:
+      working-directory: fixtures/node-subdir/app
+

@@ -39,7 +39,9 @@ Not this class: `homebrew-tap`.
 
 Detect: `package.json` plus a lockfile (`bun.lock` / `bun.lockb`, `pnpm-lock.yaml`, `package-lock.json`, or `yarn.lock`).
 
-Caller: `node-bun.yml@v1`. The workflow picks the package manager from the lockfile. Do not add a fifth class for pnpm.
+Caller: `node-bun.yml@v1`. The workflow picks the package manager from the unique lockfile. Do not add a fifth class for pnpm.
+
+If more than one supported lockfile is present, pass `package-manager`. `bun-version` defaults to `1.4.0` (callers can override). Yarn enables Corepack; Yarn 1 installs frozen, Yarn 2+ installs immutable. Cache keys use the detected lockfile path, not the working directory.
 
 **Contract:** a `ci` script in `package.json`, invoked with the lockfile's package manager.
 
