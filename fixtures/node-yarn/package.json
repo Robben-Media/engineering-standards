@@ -1,0 +1,9 @@
+{
+  "name": "fixture-node-yarn",
+  "private": true,
+  "description": "Minimal Fixture CI app",
+  "scripts": {
+    "lint": "node index.js",
+    "test": "node --test"
+  }
+}

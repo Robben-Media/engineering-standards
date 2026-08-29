@@ -33,6 +33,21 @@ Hold a live-Node caller when the repo is a lockfile scaffold with no source (`fi
 
 Out of catalog: Homebrew taps, agent workspace/soul trees, archives, forks, empty twins.
 
+## CI contract
+
+Each CI-enabled class has one explicit contract. The reusable workflow supplies the environment, dependency install, and safe defaults. The repository owns the check list.
+
+| Class | Contract | Fallback when the contract is absent |
+| --- | --- | --- |
+| Go CLI | `make ci` | Existing Makefile targets among `fmt-check`/`fmt`, `lint`, `vet`, `test`, `build`; otherwise `gofmt` / `go vet` / `go test` as today |
+| Live Node | package-manager `ci` script | `lint`, `typecheck`, `test`, and `build` scripts when present; `bun test` if Bun and there is no `test` script |
+| Python tool | `make ci` | Makefile `lint`/`test` if present; else ruff/black/mypy/pytest when configured or declared; else pytest or compileall |
+| Docs-only | Unchanged (class-drift only) | — |
+
+A repository with source, no contract, and a fallback that would run zero checks fails and points at [docs/classes.md](docs/classes.md). A lockfile or manifest scaffold with no application source stays caller-less (skip, do not fail).
+
+Add the class contract when convenient; issue #5 will add migration gates, and copied CI should not be removed until the replacement has a successful authoritative run.
+
 ## Caller shape
 
 ```yaml
@@ -51,7 +66,38 @@ jobs:
 
 Pin `@v1`, not `@main`. Add extra jobs in the caller repo when the class workflow is not enough (for example meal-planning QC). Nash or Jeremy approve exceptions; record them in [docs/inventory.md](docs/inventory.md). Do not delete copied CI until the `@v1` caller has a successful run. See [docs/migration.md](docs/migration.md).
 
-`node-bun.yml` accepts `working-directory` when `package.json` is not at the repo root (DOAR).
+`node-bun.yml` inputs:
+
+- `working-directory` (default `.`) when package.json is not at the repo root (DOAR).
+- `node-version` (default `22`) when the lockfile is not Bun.
+- `bun-version` (default `1.4.0`) pinned for reproducibility. Callers can override.
+- `package-manager` optional. Required when more than one supported lockfile is present.
+
+Detection scans working-directory for the supported lockfiles and emits the exact file path.
+That file path is passed to setup-node cache-dependency-path. Do not pass a directory.
+If more than one supported lockfile exists and package-manager is unset, the job fails.
+
+Installs stay frozen or immutable.
+
+- bun: `bun install --frozen-lockfile`
+- pnpm: `pnpm install --frozen-lockfile`
+- npm: `npm ci`
+- yarn: Corepack is enabled. Yarn 1 uses `--frozen-lockfile`. Yarn 2+ uses `--immutable`.
+
+Lockfile detect fixtures live in `fixtures/node-lockfile/` and are proven by `scripts/test-detect-node-lockfile.sh`.
+The reusable workflow inlines the same rules because checkout is the caller repo.
+
+All four workflows accept `working-directory` (default `.`) when the manifest is not at the repo root (`node-bun.yml` already did; the others gained it so this repo can host fixtures). DOAR is the Node subdirectory example.
+
+## Release
+
+See [docs/release.md](docs/release.md). Callers stay on `@v1`. Jeremy moves that tag after Nash/Jeremy review. Third-party actions in this repo are pinned to full commit SHAs.
+
+In-repo Fixture CI (`.github/workflows/fixture-ci.yml`) exercises every reusable workflow against [fixtures/](fixtures/) before `v1` moves. The initial `v1` record is [docs/releases/v1.md](docs/releases/v1.md).
+
+## Agent pointer
+
+Each repo gets a short [`templates/STANDARDS.md`](templates/STANDARDS.md). Replace `CLASS` with `go-cli`, `node-bun`, `python-tool`, or `docs-only`. Do not overwrite `AGENTS.md`.
 
 ## Templates
 
@@ -66,5 +112,3 @@ Class inventory and migration status live in this repo, not in each caller.
 - [docs/inventory.md](docs/inventory.md) — class list, status (`not-started` / `held` / `caller-open` / `pinned`), exceptions
 - [docs/equivalence/](docs/equivalence/) — retained / added / omitted / caller-specific checks for each representative
 - [docs/migration.md](docs/migration.md) — gates, extra-job approval, when copied CI may be removed
-
-Representative caller migrations are `held` until fixtures on still-open `#8` are green.

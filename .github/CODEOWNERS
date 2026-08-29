@@ -1,0 +1,6 @@
+# Review gate for the CI control plane. Jeremy is the tag owner.
+# Nash reviews by name (no GitHub login recorded in org members).
+* @itsjeremyjohnson
+.github/workflows/ @itsjeremyjohnson
+docs/release.md @itsjeremyjohnson
+docs/releases/ @itsjeremyjohnson

@@ -8,6 +8,11 @@ on:
         type: string
         required: false
         default: "1.25.1"
+      working-directory:
+        description: Directory that contains go.mod
+        type: string
+        required: false
+        default: "."
 
 jobs:
   ci:
@@ -15,42 +20,109 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
       - name: Require go.mod
+        working-directory: ${{ inputs.working-directory }}
         run: |
           set -euo pipefail
           test -f go.mod
 
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5.6.0
         with:
           go-version: ${{ inputs.go-version }}
           cache: true
+          cache-dependency-path: ${{ inputs.working-directory }}/go.sum
 
       - name: Download modules
+        working-directory: ${{ inputs.working-directory }}
         run: go mod download
 
-      - name: Format
+      - name: Run CI contract
+        working-directory: ${{ inputs.working-directory }}
         run: |
           set -euo pipefail
-          if [ -f Makefile ] && grep -qE '^fmt-check:' Makefile; then
+          # Contract: make ci. Fallback and fail-clearly: docs/classes.md
+          has_make_target() {
+            [ -f Makefile ] && grep -qE "^${1}:" Makefile
+          }
+
+          has_go_source() {
+            find . \
+              \( -path './.git' -o -path './vendor' \) -prune -o \
+              -type f -name '*.go' -print -quit | grep -q .
+          }
+
+          fail_missing_contract() {
+            echo "This repository has Go source but no CI contract and no fallback checks." >&2
+            echo "Add a make ci target, or see docs/classes.md in Robben-Media/engineering-standards." >&2
+            exit 1
+          }
+
+          if has_make_target ci; then
+            echo "CI contract: make ci"
+            make ci
+            exit 0
+          fi
+
+          if ! has_go_source; then
+            echo "No Go source and no make ci contract; treating as caller-less module scaffold. Skipping checks."
+            echo "See docs/classes.md in Robben-Media/engineering-standards."
+            exit 0
+          fi
+
+          ran=0
+
+          if has_make_target fmt-check; then
+            echo "Fallback: make fmt-check"
             make fmt-check
+            ran=$((ran + 1))
+          elif has_make_target fmt; then
+            echo "Fallback: make fmt"
+            make fmt
+            ran=$((ran + 1))
           else
+            echo "Fallback: gofmt -l ."
             unformatted="$(gofmt -l .)"
             if [ -n "$unformatted" ]; then
               echo "$unformatted"
               exit 1
             fi
+            ran=$((ran + 1))
           fi
 
-      - name: Vet
-        run: go vet ./...
+          if has_make_target lint; then
+            echo "Fallback: make lint"
+            make lint
+            ran=$((ran + 1))
+          fi
 
-      - name: Test
-        run: |
-          set -euo pipefail
-          if [ -f Makefile ] && grep -qE '^test:' Makefile; then
-            make test
+          if has_make_target vet; then
+            echo "Fallback: make vet"
+            make vet
+            ran=$((ran + 1))
           else
+            echo "Fallback: go vet ./..."
+            go vet ./...
+            ran=$((ran + 1))
+          fi
+
+          if has_make_target test; then
+            echo "Fallback: make test"
+            make test
+            ran=$((ran + 1))
+          else
+            echo "Fallback: go test ./..."
             go test ./...
+            ran=$((ran + 1))
+          fi
+
+          if has_make_target build; then
+            echo "Fallback: make build"
+            make build
+            ran=$((ran + 1))
+          fi
+
+          if [ "$ran" -eq 0 ]; then
+            fail_missing_contract
           fi
