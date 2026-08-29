@@ -18,7 +18,7 @@ jobs:
 
 ## Classes
 
-See [docs/classes.md](docs/classes.md).
+See [docs/classes.md](docs/classes.md). Inventory and status: [docs/inventory.md](docs/inventory.md). Gates: [docs/migration.md](docs/migration.md).
 
 | Class | Detect | Caller | Dependabot (Supply Chain) |
 | --- | --- | --- | --- |
@@ -64,7 +64,7 @@ jobs:
     uses: Robben-Media/engineering-standards/.github/workflows/go-cli.yml@v1
 ```
 
-Pin `@v1`, not `@main`. Add extra jobs in the caller repo when the class workflow is not enough (for example meal-planning QC).
+Pin `@v1`, not `@main`. Add extra jobs in the caller repo when the class workflow is not enough (for example meal-planning QC). Nash or Jeremy approve exceptions; record them in [docs/inventory.md](docs/inventory.md). Do not delete copied CI until the `@v1` caller has a successful run. See [docs/migration.md](docs/migration.md).
 
 `node-bun.yml` inputs:
 
@@ -104,3 +104,11 @@ Each repo gets a short [`templates/STANDARDS.md`](templates/STANDARDS.md). Repla
 Gitignore starters live in [`templates/gitignore/`](templates/gitignore/). Copy the one that matches the class. Do not paste workflows.
 
 Label names for new repos are in [docs/labels.md](docs/labels.md).
+
+## Migration
+
+Class inventory and migration status live in this repo, not in each caller.
+
+- [docs/inventory.md](docs/inventory.md) — class list, status (`not-started` / `held` / `caller-open` / `pinned`), exceptions
+- [docs/equivalence/](docs/equivalence/) — retained / added / omitted / caller-specific checks for each representative
+- [docs/migration.md](docs/migration.md) — gates, extra-job approval, when copied CI may be removed

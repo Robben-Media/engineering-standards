@@ -17,7 +17,7 @@ If the contract exists, the reusable workflow runs **only** that contract.
 
 If the contract is absent, the workflow runs a documented fallback (below). It fails with a non-zero exit and a pointer to this file only when the repository has application source **and** the fallback would run zero checks (a silent green). A lockfile or manifest scaffold with no application source is caller-less: skip checks, do not fail (`itsjeremyjohnson/finance` is the Node example).
 
-Add the class contract when convenient; issue #5 will add migration gates, and copied CI should not be removed until the replacement has a successful authoritative run.
+Add the class contract when convenient; issue #5 will add migration gates, and copied CI should not be removed until the replacement has a successful authoritative run. See [migration.md](migration.md). Nash or Jeremy approve exceptions; record them in [inventory.md](inventory.md).
 
 ## Go CLI
 
@@ -71,7 +71,11 @@ Examples: `fleet`, `hermes`, `robben-triage`.
 
 Detect: markdown, HTML, or other docs with no app manifest.
 
-No caller by default. `docs-only.yml@v1` is a class-drift check: it fails if `go.mod`, `package.json`, a JS lockfile, `pyproject.toml`, `requirements.txt`, or `Cargo.toml` appears.
+No caller by default. `docs-only.yml@v1` is a class-drift check. It fails when a supported or out-of-catalog app marker appears, and names the file plus the class or `out of catalog`.
+
+Supported markers: `go.mod` (Go CLI); `package.json` and JS lockfiles (Live Node); `pyproject.toml`, `requirements.txt`, `requirements-test.txt`, `Pipfile` (Pipenv), `uv.lock` (uv) (Python tool).
+
+Out-of-catalog markers: `Cargo.toml` (Rust), `composer.json` (Composer/PHP), `Gemfile` (Ruby), `deno.json` / `deno.jsonc` (Deno).
 
 Examples: `loan-negotiations`, `appraisal-training`, `johnson-family-insurance`, `vicki-adams-career`, `gstack-artifacts-jeremydjohnson`.
 
@@ -83,3 +87,13 @@ Do not invent a class for these. Leave them alone unless GitHub Manager assigns 
 - OpenClaw / agent workspace trees
 - Archives and forks
 - Empty twins (409 / no default-branch content)
+- WordPress / PHP trees (including Composer)
+- Ruby, Deno, and Rust app trees
+
+## Inventory and migration
+
+Do not keep a second inventory in a caller.
+
+- [inventory.md](inventory.md) — authoritative class list and status
+- [equivalence/](equivalence/) — representative comparisons
+- [migration.md](migration.md) — gates and exception approval
