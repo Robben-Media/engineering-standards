@@ -111,7 +111,7 @@ jobs:
           }
 
           has_pytest_tree() {
-            [ -d tests ] || [ -d test ] || ls test_*.py *_test.py >/dev/null 2>&1
+            [ -d tests ] || [ -d test ] || ls ./test_*.py ./*_test.py >/dev/null 2>&1
           }
 
           ensure_mod() {
