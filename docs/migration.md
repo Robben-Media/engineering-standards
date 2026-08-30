@@ -27,6 +27,10 @@ Repo Surgeon owns caller repos. GitHub Standards does not open PRs on `wpssh`, `
 
 Wave the rest of a class only after that class's representative is `pinned` in [inventory.md](inventory.md).
 
+## Pointer declarations are not callers
+
+A pointer-only `STANDARDS.md` declaration PR (adding `Profile` / `Adoption` / `Workflow` per [profiles/astro.md](profiles/astro.md)) is not a reusable-workflow caller PR and is not blocked by the current hold. It does not delete copied CI, does not alter a caller, and does not change the gates above. It also must not claim that the default branch pins `@v1`: only the released caller on the default branch makes `Workflow` `node-bun.yml@v1`.
+
 ## Exceptions and extra jobs
 
 The class workflow is the minimum. Extra jobs stay **in the caller repo**.

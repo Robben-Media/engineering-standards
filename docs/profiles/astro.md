@@ -6,6 +6,31 @@ Astro stays inside the **Live Node** class: label `class:node-bun`, caller `node
 
 Detect: an Astro repo is a Live Node repo with an `astro` dependency and an `astro.config.*` file. Detection is a catalog convention here — CI is still just the class contract: the package-manager `ci` script.
 
+## Adoption states
+
+[classes.md](../classes.md) defines the catalog `Adoption` values for the Class/Profile target named by a pointer. This section explains how each value applies to an Astro site. Adoption and workflow migration status ([inventory.md](../inventory.md)) are independent.
+
+A profiled site's root `STANDARDS.md` is a pointer (shape from [`templates/STANDARDS.md`](../../templates/STANDARDS.md)):
+
+```text
+# Standards
+Class: node-bun
+Profile: astro
+Adoption: declared
+Workflow: local
+Canon: https://github.com/Robben-Media/engineering-standards
+```
+
+`Workflow` has exactly two values: `local`, and `node-bun.yml@v1` when the default branch itself contains the released caller. An open PR does not change it. `pinned` stays the workflow status in [inventory.md](../inventory.md), not a `Workflow` value. Conformance, workflow migration, and exceptions are tracked in this canon; on conflict, the canon wins.
+
+| Adoption | Meaning |
+| --- | --- |
+| `declared` | Root `STANDARDS.md` names `Profile: astro` as the target. No conformance claim, no CI change, no tracking issue required. |
+| `migrating` | A dated gap audit exists and conformance work is active. Unfinished work is recorded as `gap` rows in the [exception register](#exception-register). Approval of a gap row acknowledges the migration plan; it does not make the gap an approved exception, and the gap blocks `verified`. |
+| `verified` | Currently enforceable profile contracts pass through the site-owned `ci` script, with dated evidence; the only deviations are approved `exception` rows in the [exception register](#exception-register), each with a compensating control. |
+
+No declaration is the absence of a pointer, not a fourth state. The future pinned publisher/attestation job in [007](../decisions/astro/007-ci-order.md) does not block `verified`, but no site may claim full artifact conformance until that job lands.
+
 ## Output modes
 
 Static output is the default. Node standalone is the only server extension.
@@ -41,11 +66,11 @@ Each record covers decision, reason, static behavior, server delta, CI proof, ex
 
 ## Exception register
 
-One register for every Astro profile exception. Site repos link their local entries here; this repo owns the rows. Nash or Jeremy approve each entry, and every entry names the decision, the exception, the reason, the compensating control, the owner, approval and review dates, and the exit condition. The caller-extra-job table in [inventory.md](../inventory.md) stays separate — it records extra CI jobs, not profile exceptions.
+One register covers Astro migration gaps and approved profile deviations. It takes two kinds of rows. A `gap` row records unfinished migration work. Nash or Jeremy approve the migration record, but that approval only acknowledges the plan; it does not make the gap an approved exception, and the gap blocks `verified`. An `exception` row is a reviewed deviation that may support `verified`. Every row names the decision, the entry, the reason, the compensating control, the owner, the recording, approval, and review dates, and the exit condition. Site repos link their local entries here; this repo owns the rows. The caller-extra-job table in [inventory.md](../inventory.md) stays separate. It records extra CI jobs, not profile rows.
 
-| Repo | Decision | Exception | Reason | Compensating control | Owner | Approved | Review | Exit |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| — none — | | | | | | | | |
+| Kind | Repo | Decision | Entry | Reason | Compensating control | Owner | Recorded | Approved | Review | Exit |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| — none — | | | | | | | | | | |
 
 ## Shared SEO library status
 
