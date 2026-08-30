@@ -51,4 +51,4 @@ Makefile targets (read in full):
 
 ## Gate
 
-Do not replace `ci.yml` until `#8` fixtures are green, Nash/Jeremy review, and a later `@v1` caller run succeeds. Do not delete the copied workflow first.
+Do not replace `ci.yml` until the migration gates pass: observed green Fixture CI on the release SHA, Nash/Jeremy review, and a successful authoritative `@v1` caller run (see [../migration.md](../migration.md)). Do not delete the copied workflow first.

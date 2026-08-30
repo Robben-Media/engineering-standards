@@ -29,6 +29,8 @@ See [docs/classes.md](docs/classes.md). Inventory and status: [docs/inventory.md
 
 Docs-only repos do not need a caller. Use the workflow only if you want CI to fail when an app manifest appears. Echo-stub CI on a docs-only repo should be removed, not replaced.
 
+Astro repos are Live Node repos with the [Astro profile](docs/profiles/astro.md). They call `node-bun.yml@v1` like any other Live Node repo. There is no `class:astro` and no fifth reusable workflow.
+
 Hold a live-Node caller when the repo is a lockfile scaffold with no source (`finance` is the example).
 
 Out of catalog: Homebrew taps, agent workspace/soul trees, archives, forks, empty twins.
@@ -46,7 +48,7 @@ Each CI-enabled class has one explicit contract. The reusable workflow supplies 
 
 A repository with source, no contract, and a fallback that would run zero checks fails and points at [docs/classes.md](docs/classes.md). A lockfile or manifest scaffold with no application source stays caller-less (skip, do not fail).
 
-Add the class contract when convenient; issue #5 will add migration gates, and copied CI should not be removed until the replacement has a successful authoritative run.
+Add the class contract when convenient. Copied CI must not be removed until the replacement has a successful authoritative run; the gates are in [docs/migration.md](docs/migration.md).
 
 ## Caller shape
 
@@ -69,7 +71,7 @@ Pin `@v1`, not `@main`. Add extra jobs in the caller repo when the class workflo
 `node-bun.yml` inputs:
 
 - `working-directory` (default `.`) when package.json is not at the repo root (DOAR).
-- `node-version` (default `22`) when the lockfile is not Bun.
+- `node-version` (default `22`). setup-node runs for every package manager, including Bun; its cache stays off for Bun (`cache: bun` is unsupported).
 - `bun-version` (default `1.4.0`) pinned for reproducibility. Callers can override.
 - `package-manager` optional. Required when more than one supported lockfile is present.
 

@@ -17,7 +17,7 @@ If the contract exists, the reusable workflow runs **only** that contract.
 
 If the contract is absent, the workflow runs a documented fallback (below). It fails with a non-zero exit and a pointer to this file only when the repository has application source **and** the fallback would run zero checks (a silent green). A lockfile or manifest scaffold with no application source is caller-less: skip checks, do not fail (`itsjeremyjohnson/finance` is the Node example).
 
-Add the class contract when convenient; issue #5 will add migration gates, and copied CI should not be removed until the replacement has a successful authoritative run. See [migration.md](migration.md). Nash or Jeremy approve exceptions; record them in [inventory.md](inventory.md).
+Add the class contract when convenient. Copied CI must not be removed until the replacement has a successful authoritative run; the gates are in [migration.md](migration.md). Nash or Jeremy approve exceptions; record them in [inventory.md](inventory.md).
 
 ## Go CLI
 
@@ -40,6 +40,8 @@ Not this class: `homebrew-tap`.
 Detect: `package.json` plus a lockfile (`bun.lock` / `bun.lockb`, `pnpm-lock.yaml`, `package-lock.json`, or `yarn.lock`).
 
 Caller: `node-bun.yml@v1`. The workflow picks the package manager from the unique lockfile. Do not add a fifth class for pnpm.
+
+Astro repos are this class with the [Astro profile](profiles/astro.md). They call the same workflow. There is no `class:astro` and no fifth reusable workflow.
 
 If more than one supported lockfile is present, pass `package-manager`. `bun-version` defaults to `1.4.0` (callers can override). Yarn enables Corepack; Yarn 1 installs frozen, Yarn 2+ installs immutable. Cache keys use the detected lockfile path, not the working directory.
 

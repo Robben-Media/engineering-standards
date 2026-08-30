@@ -1,0 +1,10 @@
+{
+  "name": "astro",
+  "version": "0.0.0-local",
+  "private": true,
+  "description": "Local no-registry stub of the astro package for the profile fixture",
+  "type": "module",
+  "exports": {
+    "./config": "./config.js"
+  }
+}

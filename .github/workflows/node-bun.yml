@@ -9,7 +9,7 @@ on:
         required: false
         default: "."
       node-version:
-        description: Node.js version when the lockfile is not Bun
+        description: Node.js version installed for every run, including Bun contracts
         type: string
         required: false
         default: "22"
@@ -114,11 +114,12 @@ jobs:
           run_install: false
           package_json_file: ${{ inputs.working-directory }}/package.json
 
+      # setup-node runs for Bun too (contracts may use node tooling).
+      # Cache stays disabled for Bun: setup-node does not support cache: bun.
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
-        if: steps.pm.outputs.name != 'bun'
         with:
           node-version: ${{ inputs.node-version }}
-          cache: ${{ steps.pm.outputs.name }}
+          cache: ${{ steps.pm.outputs.name != 'bun' && steps.pm.outputs.name || '' }}
           cache-dependency-path: ${{ steps.pm.outputs.lockfile-path }}
 
       - name: Enable Corepack

@@ -1,0 +1,10 @@
+{
+  "name": "@astrojs/node",
+  "version": "0.0.0-local",
+  "private": true,
+  "description": "Local no-registry stub of the Astro Node adapter for the profile fixture",
+  "type": "module",
+  "exports": {
+    ".": "./index.js"
+  }
+}

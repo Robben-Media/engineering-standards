@@ -35,4 +35,4 @@ None. There is no workflow file to retain.
 
 ## Gate
 
-Do not add a caller until `#8` fixtures are green and Nash/Jeremy review. Repo Surgeon owns callers.
+Do not add a caller until the migration gates pass: green Fixture CI on the release SHA and Nash/Jeremy review (see [../migration.md](../migration.md)). Repo Surgeon owns callers.
