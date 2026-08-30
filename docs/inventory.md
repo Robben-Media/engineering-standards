@@ -4,7 +4,7 @@ Authoritative Robben Media class inventory and migration status. Callers do not 
 
 Status lives here. Surgeon does not invent a parallel list.
 
-Observed 2026-08-28 via `gh api` as `itsjeremyjohnson`. No clones. Default-branch contents only, except open caller PRs named below.
+First observed 2026-08-28; re-checked 2026-08-30 via `gh api` as `itsjeremyjohnson`. No clones. Default-branch contents only, except open caller PRs named below.
 
 ## Status values
 
@@ -21,13 +21,13 @@ Observed 2026-08-28 via `gh api` as `itsjeremyjohnson`. No clones. Default-branc
 
 - `Robben-Media` has **70** repos (`gh api --paginate orgs/Robben-Media/repos`).
 - `refs/tags/v1` points at `472bfa146993442c7ab32fe3920622a030905bec` (the `#1` merge on `main`). No GitHub Releases.
-- **0** default branches pin `@v1`. Evidence: `gh search code "engineering-standards/.github/workflows" --owner Robben-Media` returns only this repo's README; a same-day scan of default-branch workflow files found no `Robben-Media/engineering-standards` reference; the three caller PRs below are still open and unmerged.
-- **3** CI-only caller PRs are open (Repo Surgeon; Nash told Surgeon to hold further callers):
-  - [police-scanner-feed#58](https://github.com/Robben-Media/police-scanner-feed/pull/58) — `node-bun.yml@v1`, state `open`, `merged=false`
-  - [robbenmedia-site#135](https://github.com/Robben-Media/robbenmedia-site/pull/135) — `node-bun.yml@v1`, state `open`, `merged=false`
-  - [cmart10#123](https://github.com/Robben-Media/cmart10/pull/123) — `node-bun.yml@v1`, state `open`, `merged=false`
-- Fixture CI is **not** on `main`. It lives on still-open [engineering-standards#8](https://github.com/Robben-Media/engineering-standards/pull/8). The adoption gate is not cleared.
-- No Actions run on a caller `@v1` pin was inspected. None is claimed.
+- **0** default branches pin `@v1`. Evidence: `gh search code "engineering-standards/.github/workflows" --owner Robben-Media` returns only this repo's README; a default-branch workflow scan found no `Robben-Media/engineering-standards` reference. The three caller PRs below pin `@v1` on their branches, but none is merged, so no default branch pins it.
+- **3** CI-only caller PRs are open (Repo Surgeon; Nash told Surgeon to hold further callers). Known check state from the 2026-08-30 refresh — none of these is an authoritative successful representative run, and the adoption gates stay closed:
+  - [police-scanner-feed#58](https://github.com/Robben-Media/police-scanner-feed/pull/58) — `node-bun.yml@v1`, state `open`, `merged=false`. Checks **fail**.
+  - [robbenmedia-site#135](https://github.com/Robben-Media/robbenmedia-site/pull/135) — `node-bun.yml@v1`, state `open`, `merged=false`. Checks **fail**.
+  - [cmart10#123](https://github.com/Robben-Media/cmart10/pull/123) — `node-bun.yml@v1`, state `open`, `merged=false`. Checks **passed**, but against the old `v1` (`472bfa1`), not the current workflows.
+- Fixture CI is on `main` (merged via [engineering-standards#8](https://github.com/Robben-Media/engineering-standards/pull/8)). The moving `v1` tag still points at `472bfa146993442c7ab32fe3920622a030905bec`. The adoption gate is **not** cleared: nothing pins `@v1` on a default branch and no caller has an authoritative `@v1` run.
+- No authoritative representative `@v1` success is claimed. The check states above are the record: `#58` and `#135` fail; `#123` passed against the old `v1`, before the current workflows.
 
 Default branches of the three caller repos still have copied or missing class CI:
 
@@ -39,7 +39,7 @@ Default branches of the three caller repos still have copied or missing class CI
 
 ## Intended representatives (held)
 
-Migrate **one** representative per supported class only after fixtures on `#8` are green and Nash/Jeremy review. This change names them and records equivalence. It does **not** open caller PRs.
+Migrate **one** representative per supported class only after Fixture CI on `main` is green and Nash/Jeremy review. This change names them and records equivalence. It does **not** open caller PRs.
 
 | Class | Intended representative | Status | Why this one |
 | --- | --- | --- | --- |
@@ -67,6 +67,10 @@ Extra jobs stay in the caller. Nash or Jeremy approve. Record them here.
 | `itsjeremyjohnson/wpssh` | `make lint` (golangci-lint via Makefile) is not in `go-cli.yml` | Proposed caller-specific extra job. Not approved yet. | `held` |
 
 No approved exception has been used to delete copied CI.
+
+## Astro profile exceptions
+
+Astro repos keep the Live Node class. Profile decision exceptions — URL policy, SEO, scripts, source layout, environment, headers, deployment — are registered once, in [profiles/astro.md](profiles/astro.md#exception-register). Site-local entries link there. The caller-extra-job table above stays separate and keeps recording extra CI jobs, not profile deviations.
 
 ## Robben-Media by class
 

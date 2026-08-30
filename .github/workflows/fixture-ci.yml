@@ -80,3 +80,17 @@ jobs:
     with:
       working-directory: fixtures/node-subdir/app
 
+  astro-static:
+    name: astro-static
+    uses: ./.github/workflows/node-bun.yml
+    with:
+      working-directory: fixtures/astro-static
+      node-version: "22.23.2"
+
+  astro-server:
+    name: astro-server
+    uses: ./.github/workflows/node-bun.yml
+    with:
+      working-directory: fixtures/astro-server
+      node-version: "22.23.2"
+

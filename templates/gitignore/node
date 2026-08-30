@@ -3,7 +3,11 @@ dist/
 build/
 coverage/
 .next/
+.astro/
 .turbo/
+playwright-report/
+test-results/
+playwright/.cache/
 *.log
 .DS_Store
 .idea/

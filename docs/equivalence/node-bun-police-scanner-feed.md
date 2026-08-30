@@ -42,4 +42,4 @@ These are placeholders. They do not install, lint, or test.
 
 ## Gate
 
-`#58` must stay open and unmerged until fixtures on `#8` pass and a later authoritative `@v1` run succeeds. This change does not touch that PR. Do not delete the echo-stub first.
+`#58` must stay open and unmerged until the migration gates pass and an authoritative `@v1` run succeeds on it (see [../migration.md](../migration.md)). This change does not touch that PR. Do not delete the echo-stub first.

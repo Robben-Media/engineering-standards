@@ -81,14 +81,14 @@ Repo ruleset targeting `refs/heads/main`, enforcement `active`:
 - Block history rewrites and branch deletion
 - Require a pull request with 1 approving review (Nash or Jeremy)
 - Dismiss stale reviews on new pushes
-- After Fixture CI has been observed green on this repo, require the status checks GitHub actually reports for that workflow (reusable calls typically appear as `<job> / ci`). Expected job ids: `lint-workflows`, `go-cli`, `python-tool`, `docs-only`, plus one job per Node package-manager fixture and the subdirectory fixture.
+- After Fixture CI has been observed green on this repo, require the status checks GitHub actually reports for that workflow (reusable calls typically appear as `<job> / ci`). Expected job ids: `lint-workflows`, `go-cli`, `python-tool`, `docs-only`, `astro-static`, `astro-server`, plus one job per Node package-manager fixture and the subdirectory fixture.
 
 Tag ruleset targeting `refs/tags/v1`:
 
 - Only Jeremy (`itsjeremyjohnson`) may create or update the tag
 - No deletion of `v1` except as part of an immediate retag
 
-This token can create repo rulesets (admin on the repository) but cannot manage org rulesets. Repo rulesets were left uncreated so in-flight PRs #6 and #7 are not surprised by a new blocking gate. Enable the intended rulesets after this PR is reviewed.
+This token can create repo rulesets (admin on the repository) but cannot manage org rulesets. Repo rulesets were left uncreated so the early rollout PRs (#6, #7, #8 — all merged) landed without a new blocking gate. Enable the intended rulesets before the next `v1` move.
 
 ## Fixture strategy
 

@@ -21,3 +21,5 @@ Class (one per repo, on the repo or as a note in the first issue; do not stack):
 - `class:node-bun`
 - `class:python-tool`
 - `class:docs-only`
+
+Astro repos stay `class:node-bun` (Astro is a [profile](profiles/astro.md), not a class; there is no `class:astro`).
