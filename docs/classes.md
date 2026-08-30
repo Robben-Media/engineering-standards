@@ -41,7 +41,7 @@ Detect: `package.json` plus a lockfile (`bun.lock` / `bun.lockb`, `pnpm-lock.yam
 
 Caller: `node-bun.yml@v1`. The workflow picks the package manager from the unique lockfile. Do not add a fifth class for pnpm.
 
-Astro repos are this class with the [Astro profile](profiles/astro.md). They call the same workflow. There is no `class:astro` and no fifth reusable workflow.
+Astro repos are this class with the [Astro profile](profiles/astro.md). They call `node-bun.yml@v1` when pinned; declaring the profile does not configure CI. There is no `class:astro` and no fifth reusable workflow.
 
 If more than one supported lockfile is present, pass `package-manager`. `bun-version` defaults to `1.4.0` (callers can override). Yarn enables Corepack; Yarn 1 installs frozen, Yarn 2+ installs immutable. Cache keys use the detected lockfile path, not the working directory.
 
@@ -92,10 +92,23 @@ Do not invent a class for these. Leave them alone unless GitHub Manager assigns 
 - WordPress / PHP trees (including Composer)
 - Ruby, Deno, and Rust app trees
 
+## Adoption
+
+The `Adoption` field in a repo's `STANDARDS.md` pointer applies to the target the pointer selects: the class alone when `Profile` is `none`, the class plus the profile otherwise. `Adoption` and `Workflow` are independent.
+
+| Value | Meaning |
+| --- | --- |
+| `declared` | The pointer names the target. No conformance claim. |
+| `migrating` | A dated gap audit exists and conformance work is active. |
+| `verified` | The currently enforceable class and profile contracts pass, with dated evidence and approved exceptions. |
+
+A profile may add proof requirements on top of these values; the [Astro profile](profiles/astro.md) defines what each value requires for an Astro site.
+
 ## Inventory and migration
 
-Do not keep a second inventory in a caller.
+Do not keep a second inventory in a caller. A repo's `STANDARDS.md` pointer (`Class`, `Profile`, `Adoption`, `Workflow`) names the catalog entry; the canon owns the status, not the caller.
 
-- [inventory.md](inventory.md) — authoritative class list and status
+- [inventory.md](inventory.md) — authoritative class list, workflow migration status, and Astro adoption
+- [profiles/astro.md](profiles/astro.md) — Astro profile and adoption-state definitions
 - [equivalence/](equivalence/) — representative comparisons
 - [migration.md](migration.md) — gates and exception approval

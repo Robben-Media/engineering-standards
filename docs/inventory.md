@@ -72,6 +72,31 @@ No approved exception has been used to delete copied CI.
 
 Astro repos keep the Live Node class. Profile decision exceptions — URL policy, SEO, scripts, source layout, environment, headers, deployment — are registered once, in [profiles/astro.md](profiles/astro.md#exception-register). Site-local entries link there. The caller-extra-job table above stays separate and keeps recording extra CI jobs, not profile deviations.
 
+## Astro profile adoption
+
+Pointer fields are defined in [profiles/astro.md](profiles/astro.md). This table covers the 12 Astro site repos and reflects default branches as of the 2026-08-30 re-check. Workflow migration status stays in the Live Node table below; the two are independent.
+
+| Repo | Output mode | Adoption | Workflow | Evidence |
+| --- | --- | --- | --- | --- |
+| `cmart10` | server (Node standalone) | `none` | `local` | Node standalone output; legacy pointer, no `Profile: astro`; caller PR `#123` open. |
+| `csi-omaha` | static | `none` | `local` | Root Astro site; no server output; no root declaration. |
+| `erintuckercoaching` | static | `none` | `local` | Root Astro site; no server output; no root declaration. |
+| `jeremyhasnoplan.com` | static | `none` | `local` | Root Astro site; no server output; no root declaration. |
+| `robbenmedia-site` | static | `none` | `local` | Static output; legacy pointer, no `Profile: astro`; caller PR `#135` open. |
+| `website-build-boone-homes` | static | `none` | `local` | Root Astro site; no server output; no root declaration. |
+| `website-build-dentistwebbooster` | static | `none` | `local` | Root Astro site; no server output; no root declaration. |
+| `website-build-greenieco` | static | `none` | `local` | Root Astro site; no server output; no root declaration. |
+| `website-build-midwest-custom-trucks` | static | `none` | `local` | Root Astro site; no server output; no root declaration. |
+| `website-build-northern-sun` | static | `none` | `local` | Root Astro site; no server output; no root declaration. |
+| `website-build-quirky-compass-travel-co` | static | `none` | `local` | Root Astro site; no server output; no root declaration. |
+| `website-build-terr-homes` | static | `none` | `local` | Root Astro site; no server output; no root declaration. |
+
+`none` is the absence of a declaration, not a fourth adoption state. `static` includes the Astro default output; only `cmart10` is server.
+
+The open caller PRs (`#123`, `#135`) do not make `Workflow` `node-bun.yml@v1`: that value requires the released caller on the default branch itself, so both rows stay `local`.
+
+Not in this table: `create-astro-site` (scaffolder), `rm-astro-seo` (library), `directories` (nested app), this repo's `fixtures/`, forks, empty repos, and non-Astro repos.
+
 ## Robben-Media by class
 
 Classify by default-branch markers, not the language badge. See [classes.md](classes.md).

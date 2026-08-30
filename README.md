@@ -29,7 +29,7 @@ See [docs/classes.md](docs/classes.md). Inventory and status: [docs/inventory.md
 
 Docs-only repos do not need a caller. Use the workflow only if you want CI to fail when an app manifest appears. Echo-stub CI on a docs-only repo should be removed, not replaced.
 
-Astro repos are Live Node repos with the [Astro profile](docs/profiles/astro.md). They call `node-bun.yml@v1` like any other Live Node repo. There is no `class:astro` and no fifth reusable workflow.
+Astro repos are Live Node repos with the [Astro profile](docs/profiles/astro.md). They call `node-bun.yml@v1` when pinned; declaring the profile does not configure CI. There is no `class:astro` and no fifth reusable workflow.
 
 Hold a live-Node caller when the repo is a lockfile scaffold with no source (`finance` is the example).
 
@@ -99,7 +99,7 @@ In-repo Fixture CI (`.github/workflows/fixture-ci.yml`) exercises every reusable
 
 ## Agent pointer
 
-Each repo gets a short [`templates/STANDARDS.md`](templates/STANDARDS.md). Replace `CLASS` with `go-cli`, `node-bun`, `python-tool`, or `docs-only`. Do not overwrite `AGENTS.md`.
+Each repo gets a short [`templates/STANDARDS.md`](templates/STANDARDS.md). Replace `CLASS` with `go-cli`, `node-bun`, `python-tool`, or `docs-only`, and set `Profile` to `astro` or `none`. Keep `Adoption: declared` and `Workflow: local` until [docs/inventory.md](docs/inventory.md) records otherwise. The pointer names the catalog entry. It does not configure CI. The canon records adoption and workflow status. Do not overwrite `AGENTS.md`.
 
 ## Templates
 
